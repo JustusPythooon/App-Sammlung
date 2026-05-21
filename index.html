@@ -1,103 +1,531 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Julius App Launcher</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f0f0f0;
-            padding: 40px;
-            text-align: center;
-        }
-        h1 {
-            font-size: 40px;
-            margin-bottom: 30px;
-        }
-        .app-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
-            margin: auto;
-        }
-        .app-card {
-            background: white;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            overflow: hidden;
-            transition: 0.2s;
-        }
-        .app-card:hover {
-            transform: scale(1.03);
-        }
-        .app-card img {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-        }
-        .app-content {
-            padding: 20px;
-            text-align: left;
-        }
-        .tags {
-            margin: 10px 0;
-        }
-        .tag {
-            display: inline-block;
-            background: #eee;
-            padding: 4px 10px;
-            border-radius: 8px;
-            margin-right: 5px;
-            font-size: 12px;
-        }
-        .start-btn {
-            margin-top: 15px;
-            display: inline-block;
-            padding: 10px 18px;
-            background: #0078ff;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .start-btn:hover {
-            background: #005fcc;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Meine App Sammlung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card-bg: #ffffff;
+      --accent: #4b7bec;
+      --accent-soft: rgba(75, 123, 236, 0.12);
+      --text-main: #1f2933;
+      --text-muted: #6b7280;
+      --radius-lg: 18px;
+      --radius-md: 10px;
+      --shadow-soft: 0 14px 30px rgba(15, 23, 42, 0.12);
+      --shadow-hover: 0 18px 40px rgba(15, 23, 42, 0.18);
+      --transition-fast: 0.18s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top left, #e0ebff 0, #f5f7fb 40%, #ffffff 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(18px);
+      border-radius: 26px;
+      box-shadow: var(--shadow-soft);
+      padding: 26px 26px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* kleine „Glow“-Deko */
+    .app-shell::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(74, 144, 226, 0.18), transparent 55%),
+        radial-gradient(circle at 100% 0%, rgba(52, 211, 153, 0.18), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      gap: 12px;
+    }
+
+    .title-group h1 {
+      font-size: 1.6rem;
+      letter-spacing: 0.02em;
+    }
+
+    .title-group p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(75, 123, 236, 0.25);
+      animation: pulse 1.6s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      70% { transform: scale(1.4); opacity: 0; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+
+    .app-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), translate var(--transition-fast);
+      position: relative;
+      cursor: default;
+    }
+
+    .app-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(75, 123, 236, 0.12), transparent 40%, rgba(52, 211, 153, 0.12));
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+      pointer-events: none;
+    }
+
+    .app-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .app-card:hover::before {
+      opacity: 1;
+    }
+
+    .app-screenshot {
+      position: relative;
+      overflow: hidden;
+      border-radius: 0 0 18px 18px;
+      background: #e5e7eb;
+      max-height: 180px;
+    }
+
+    .app-screenshot img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+      transform: scale(1.02);
+      transition: transform 0.4s ease-out;
+    }
+
+    .app-card:hover .app-screenshot img {
+      transform: scale(1.06);
+    }
+
+    .app-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.7);
+      color: #f9fafb;
+      font-size: 0.7rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .app-body {
+      padding: 14px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .app-title {
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .app-title span {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: #f3f4f6;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .app-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      min-height: 2.4em;
+    }
+
+    .app-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      gap: 8px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 7px 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-ghost {
+      background: #f3f4f6;
+      color: var(--text-main);
+    }
+
+    .btn-ghost:hover {
+      background: #e5e7eb;
+    }
+
+    .app-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Modal für „Mehr Infos“ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 16px;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+      animation: fadeIn 0.18s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 20px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.4);
+      padding: 18px 18px 16px;
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 10px;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      border: none;
+      background: #f3f4f6;
+      border-radius: 999px;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: #6b7280;
+    }
+
+    .modal-body {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .modal-body p {
+      margin-bottom: 6px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 18px 10px;
+      }
+      .app-shell {
+        padding: 18px 16px 20px;
+        border-radius: 18px;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="app-shell">
+    <header>
+      <div class="title-group">
+        <h1>Meine App Sammlung</h1>
+        <p>Wähle eine App aus, um sie zu öffnen oder mehr Infos zu sehen.</p>
+      </div>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span>GitHub App Hub</span>
+      </div>
+    </header>
 
-<h1>📱 Julius App Launcher</h1>
+    <main class="app-grid">
+      <!-- APP 1 -->
+      <article class="app-card"
+               data-name="Todo Manager"
+               data-info="Ein schlanker To‑Do Manager mit Kategorien, Dark‑Mode und lokalem Speicher. Perfekt für schnelle Aufgabenlisten."
+               data-link="https://example.com/todo">
+        <div class="app-screenshot">
+          <span class="app-tag">Produktivität</span>
+          <!-- Screenshot-Bild ersetzen -->
+          <img src="https://via.placeholder.com/600x350.png?text=Todo+App+Screenshot" alt="Todo App Screenshot">
+        </div>
+        <div class="app-body">
+          <div class="app-title">
+            Todo Manager
+            <span>Web App</span>
+          </div>
+          <p class="app-desc">
+            Organisiere deine Aufgaben mit einem klaren, minimalen Interface und speichere alles im Browser.
+          </p>
+          <div class="app-footer">
+            <div class="btn-row">
+              <a class="btn btn-primary" href="https://example.com/todo" target="_blank" rel="noopener noreferrer">
+                Öffnen
+              </a>
+              <button class="btn btn-ghost btn-more">
+                Mehr Infos
+              </button>
+            </div>
+            <div class="app-meta">
+              v1.0 · Letztes Update: 2026
+            </div>
+          </div>
+        </div>
+      </article>
 
-<div class="app-grid" id="appGrid"></div>
+      <!-- APP 2 -->
+      <article class="app-card"
+               data-name="Image Viewer"
+               data-info="Ein einfacher Bild‑Viewer mit Drag & Drop, Zoom und Lightbox‑Effekt. Läuft komplett im Browser."
+               data-link="https://example.com/imageviewer">
+        <div class="app-screenshot">
+          <span class="app-tag">Tools</span>
+          <img src="https://via.placeholder.com/600x350.png?text=Image+Viewer+Screenshot" alt="Image Viewer Screenshot">
+        </div>
+        <div class="app-body">
+          <div class="app-title">
+            Image Viewer
+            <span>Utility</span>
+          </div>
+          <p class="app-desc">
+            Ziehe Bilder in das Fenster, blättere durch deine Dateien und zoome mit einem smoothen UI.
+          </p>
+          <div class="app-footer">
+            <div class="btn-row">
+              <a class="btn btn-primary" href="https://example.com/imageviewer" target="_blank" rel="noopener noreferrer">
+                Öffnen
+              </a>
+              <button class="btn btn-ghost btn-more">
+                Mehr Infos
+              </button>
+            </div>
+            <div class="app-meta">
+              v0.9 · Beta
+            </div>
+          </div>
+        </div>
+      </article>
 
-<script>
-fetch("apps.json")
-    .then(res => res.json())
-    .then(apps => {
-        const grid = document.getElementById("appGrid");
+      <!-- APP 3 -->
+      <article class="app-card"
+               data-name="Mini Game"
+               data-info="Ein kleines Browser‑Game mit Highscore‑Speicher. Ideal zum kurzen Abschalten zwischendurch."
+               data-link="https://example.com/minigame">
+        <div class="app-screenshot">
+          <span class="app-tag">Game</span>
+          <img src="https://via.placeholder.com/600x350.png?text=Mini+Game+Screenshot" alt="Mini Game Screenshot">
+        </div>
+        <div class="app-body">
+          <div class="app-title">
+            Mini Game
+            <span>Fun</span>
+          </div>
+          <p class="app-desc">
+            Reagiere schnell, sammle Punkte und knacke deinen eigenen Highscore – direkt im Browser.
+          </p>
+          <div class="app-footer">
+            <div class="btn-row">
+              <a class="btn btn-primary" href="https://example.com/minigame" target="_blank" rel="noopener noreferrer">
+                Öffnen
+              </a>
+              <button class="btn btn-ghost btn-more">
+                Mehr Infos
+              </button>
+            </div>
+            <div class="app-meta">
+              v1.2 · Arcade
+            </div>
+          </div>
+        </div>
+      </article>
+    </main>
+  </div>
 
-        apps.forEach(app => {
-            const card = document.createElement("div");
-            card.className = "app-card";
+  <!-- Modal für Mehr Infos -->
+  <div class="modal-backdrop" id="infoModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">App Titel</div>
+        <button class="modal-close" id="modalClose" aria-label="Schließen">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="modalText">Hier stehen die Details zur App.</p>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary" id="modalOpenLink" href="#" target="_blank" rel="noopener noreferrer">
+          App öffnen
+        </a>
+        <button class="btn btn-ghost" id="modalCancel">
+          Schließen
+        </button>
+      </div>
+    </div>
+  </div>
 
-            card.innerHTML = `
-                <img src="${app.image}" alt="${app.name}">
-                <div class="app-content">
-                    <h2>${app.name}</h2>
-                    <p>${app.description}</p>
-                    <div class="tags">
-                        ${app.tags.map(t => `<span class="tag">${t}</span>`).join("")}
-                    </div>
-                    <a class="start-btn" href="${app.folder}/index.html">Starten</a>
-                </div>
-            `;
+  <script>
+    // Modal-Logik für „Mehr Infos“
+    const modalBackdrop = document.getElementById("infoModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalText = document.getElementById("modalText");
+    const modalOpenLink = document.getElementById("modalOpenLink");
+    const modalClose = document.getElementById("modalClose");
+    const modalCancel = document.getElementById("modalCancel");
 
-            grid.appendChild(card);
-        });
+    function openModal(name, info, link) {
+      modalTitle.textContent = name;
+      modalText.textContent = info;
+      modalOpenLink.href = link;
+      modalBackdrop.classList.add("active");
+    }
+
+    function closeModal() {
+      modalBackdrop.classList.remove("active");
+    }
+
+    document.querySelectorAll(".btn-more").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const card = btn.closest(".app-card");
+        const name = card.dataset.name || "App";
+        const info = card.dataset.info || "Keine weiteren Informationen verfügbar.";
+        const link = card.dataset.link || "#";
+        openModal(name, info, link);
+      });
     });
-</script>
 
+    modalClose.addEventListener("click", closeModal);
+    modalCancel.addEventListener("click", closeModal);
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) closeModal();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+    });
+  </script>
 </body>
 </html>
