@@ -1,1 +1,30 @@
-
+[
+    {
+        "name": "Schnitzeljagd App",
+        "folder": "scavenger",
+        "image": "https://i.imgur.com/8QfQZ7K.png",
+        "description": "Eine moderne Schnitzeljagd-App mit QR-Scan, Code-Eingabe und Live-Fortschritt.",
+        "tags": ["Utility", "QR", "Game"]
+    },
+    {
+        "name": "Jump & Run",
+        "folder": "jumpandrun",
+        "image": "https://i.imgur.com/2yaf2kT.png",
+        "description": "Ein 20-Level Jump & Run mit Animationen und Sound.",
+        "tags": ["Platformer", "Game"]
+    },
+    {
+        "name": "Mario Kart Clone",
+        "folder": "mariokart",
+        "image": "https://i.imgur.com/6V5xJpT.png",
+        "description": "Ein schnelles Rennspiel mit Power-Ups und Multiplayer.",
+        "tags": ["Racing", "Multiplayer"]
+    },
+    {
+        "name": "Pythoooo0 Konsole",
+        "folder": "pyconsole",
+        "image": "https://i.imgur.com/3ZQ2w8P.png",
+        "description": "Eine interaktive Python-Konsole über PyScript.",
+        "tags": ["Python", "Console"]
+    }
+]
