@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Julius App Launcher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 40px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 40px;
+            margin-bottom: 30px;
+        }
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .app-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: 0.2s;
+        }
+        .app-card:hover {
+            transform: scale(1.03);
+        }
+        .app-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        .app-content {
+            padding: 20px;
+            text-align: left;
+        }
+        .tags {
+            margin: 10px 0;
+        }
+        .tag {
+            display: inline-block;
+            background: #eee;
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin-right: 5px;
+            font-size: 12px;
+        }
+        .start-btn {
+            margin-top: 15px;
+            display: inline-block;
+            padding: 10px 18px;
+            background: #0078ff;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .start-btn:hover {
+            background: #005fcc;
+        }
+    </style>
+</head>
+<body>
+
+<h1>📱 Julius App Launcher</h1>
+
+<div class="app-grid" id="appGrid"></div>
+
+<script>
+fetch("apps.json")
+    .then(res => res.json())
+    .then(apps => {
+        const grid = document.getElementById("appGrid");
+
+        apps.forEach(app => {
+            const card = document.createElement("div");
+            card.className = "app-card";
+
+            card.innerHTML = `
+                <img src="${app.image}" alt="${app.name}">
+                <div class="app-content">
+                    <h2>${app.name}</h2>
+                    <p>${app.description}</p>
+                    <div class="tags">
+                        ${app.tags.map(t => `<span class="tag">${t}</span>`).join("")}
+                    </div>
+                    <a class="start-btn" href="${app.folder}/index.html">Starten</a>
+                </div>
+            `;
+
+            grid.appendChild(card);
+        });
+    });
+</script>
+
+</body>
+</html>
